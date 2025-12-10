@@ -8,23 +8,26 @@ struct Patient {
     int id;
     string name;
     int level;
+    string status;
+    string reason;
+    int waitRounds;
 };
 
 vector<Patient> patientList;
 
 void addPatient() {
     Patient temp;
-    cout<<"\n--- New Patient ---\n";
+    cout<<"\n========== New Patient ==========\n";
 
-    cout<<"Enter Patient ID: ";
+    cout<<"\nEnter Patient ID: ";
 
     cin >> temp.id;
     cin.ignore();
     
-    cout <<"Patient Name: ";
+    cout <<"\nPatient Name: ";
     getline(cin, temp.name);
 
-    cout << "Enter triage level (condition) -> 1 = Critical, 2 = Urgent, 3 = Non-urgent. : ";
+    cout << "\nEnter patient's condition -> 1 = Critical, 2 = Urgent, 3 = Non-urgent. : ";
     cin >> temp.level;
 
     if (temp.level < 1 || temp.level > 3) {
@@ -32,8 +35,11 @@ void addPatient() {
         return;
     }
 
+    temp.status = "Waiting";
+    temp.waitRounds = 0;
+
     patientList.push_back(temp);
-    cout <<"Patient added to system.\n";
+    cout <<"\nThe Patient is added to the system.\n";
 }
 
 string triageLevel(int level) {
@@ -47,11 +53,42 @@ string triageLevel(int level) {
         return "Unspecified";
 }
 
+void patientConditions() {
+    cout << "\n========== Patients' Conditions ==========\n";
+
+    if (patientList.empty()) {
+        cout << "\nPatient list empty.\n";
+        return;
+    }
+
+    bool patientWorsened = false;
+
+    for (int i = 0; i < patientList.size(); i++) {
+        if (patientList[i].status == "Waiting") {
+            patientList[i].waitRounds++;
+                if (patientList[i].waitRounds >= 2 && patientList[i].level > 1) {
+                    int previousLevel = patientList[i].level;
+                    patientList[i].level--;
+                    patientList[i].waitRounds = 0;
+
+                    patientWorsened = true;
+                    cout << "[ALERT] Patient " << patientList[i].name
+                        << "'s condition got worse: "
+                        << triageLevel(previousLevel) << " -> "
+                        << triageLevel(patientList[i].level) << endl;
+                }
+        }
+    }
+    if (!patientWorsened) {
+        cout<< "No patient condition worsened.\n";
+    }
+ }
+
 void waitingList() {
-    cout<< "\n--- Patient List ---\n";
+    cout<< "\n========== Patient List ==========\n";
 
     if(patientList.empty()) {
-        cout << "Patient list empty.\n";
+        cout << "\nPatient list empty.\n";
         return;
     }
     
@@ -67,9 +104,9 @@ void menu() {
     cout<<"\n==============================\n";
     cout<<"  ✙ Hospital Triage System ✙ ";
     cout<<"\n==============================\n";
-    cout<<"1. Add a new patient\n";
-    cout<<"2. Show patients on waiting list\n";
-    cout<<"0. Exit\n";
+    cout<<"\n 1. Add a new patient\n";
+    cout<<"\n 2. Show patients on waiting list\n";
+    cout<<"\n 0. Exit\n";
 }
 
 int main() {
@@ -90,6 +127,10 @@ int main() {
         }
         else {
             cout << "Invalid choice.\n";
+        }
+
+        if (choice != 0) {
+            patientConditions();
         }
 
     } while (choice != 0);
