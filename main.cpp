@@ -36,6 +36,17 @@ void addPatient() {
     cout <<"Patient added to system.\n";
 }
 
+string triageLevel(int level) {
+    if (level == 1)
+        return "Critical";
+    else if (level == 2)
+        return "Urgent";
+    else if (level == 3)
+        return "Non-urgent";
+    else
+        return "Unspecified";
+}
+
 void waitingList() {
     cout<< "\n--- Patient List ---\n";
 
@@ -48,13 +59,13 @@ void waitingList() {
         cout << i + 1 << ". ";
         cout << "Name: " << patientList[i].name
             << ", ID: " << patientList[i].id
-            << ", Triage Level: " << patientList[i].level << endl;
+            << ", Triage Level: " << triageLevel(patientList[i].level) << endl;
     }
 }
 
 void menu() {
     cout<<"\n==============================\n";
-    cout<<"  Hospital Triage System !! ";
+    cout<<"  ✙ Hospital Triage System ✙ ";
     cout<<"\n==============================\n";
     cout<<"1. Add a new patient\n";
     cout<<"2. Show patients on waiting list\n";
