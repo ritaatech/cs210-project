@@ -21,14 +21,25 @@ void addPatient() {
 
     cout<<"\nEnter Patient ID: ";
 
-    cin >> temp.id;
-    cin.ignore();
+    if(!(cin >>  temp.id)) {
+        cout << "\nInvalid input .\n";
+        cin.clear();
+        cin.ignore(1000, '\n');
+        return;
+    }
+
+    cin.ignore(1000, '\n');
     
     cout <<"\nPatient Name: ";
     getline(cin, temp.name);
 
     cout << "\nEnter patient's condition -> 1 = Critical, 2 = Urgent, 3 = Non-urgent. : ";
-    cin >> temp.level;
+        if(!(cin >> temp.level)) {
+        cout << "Invalid input .\n";
+        cin.clear();
+        cin.ignore(1000, '\n');
+        return;
+    }
 
     if (temp.level < 1 || temp.level > 3) {
         cout <<"Invalid level.\n";
@@ -72,8 +83,8 @@ void patientConditions() {
                     patientList[i].waitRounds = 0;
 
                     patientWorsened = true;
-                    cout << "[ALERT] Patient " << patientList[i].name
-                        << "'s condition got worse: "
+                    cout << "\n[ALERT] Patient " << patientList[i].name
+                        << "'s condition got worse !! : "
                         << triageLevel(previousLevel) << " -> "
                         << triageLevel(patientList[i].level) << endl;
                 }
@@ -114,7 +125,10 @@ int main() {
 
     do {
         menu();
-        cin >> choice;
+        if (!(cin >> choice)) {
+            cout << "Invalid input. Try again.\n";
+            break;
+        }
 
         if (choice == 1) {
             addPatient();
@@ -123,7 +137,7 @@ int main() {
             waitingList();
         }
         else if (choice == 0) {
-            cout << "System closed.\n";
+            cout << "\nSystem closed.\n";
         }
         else {
             cout << "Invalid choice.\n";
