@@ -3,10 +3,8 @@
 #include <vector>
 #include <queue>
 #include <unordered_map>
+#include <map>
 using namespace std;
-
-queue<Patient> incomingQueue;
-unordered_map<int, Patient*> patientSearch;
 
 struct Patient {
     int id;
@@ -17,9 +15,18 @@ struct Patient {
     int waitRounds;
 };
 
+queue<Patient> incomingQueue;
+unordered_map<int, Patient*> patientSearch;
+
 vector<Patient> patientList;
 int userLives = 3;
 int nextId = 1;
+
+map<string, vector<string>> hospitalGraph = {
+    {"Emergency Room", {"Radiology", "Surgery"}},
+    {"ICU", {"Emergency Room", "Surgery"}},
+    {"Surgery", {"Emergency Room", "ICU", "Discharge"}},
+};
 
 string triageLevel(int level) {
     if (level == 1)
@@ -30,6 +37,18 @@ string triageLevel(int level) {
         return "Non-urgent";
     else
         return "Unspecified";
+}
+
+void hospitalDeparments() {
+    cout << "\n ===== Hospital Departments ===== \n";
+
+    for (auto &entry : hospitalGraph) {
+        cout << entry.first << " -> ";
+        for (const string &neighbor : entry.second) {
+            cout << neighbor << "  ";
+        }
+        cout << "\n";
+    }
 }
 
 void addPatient() {
@@ -223,6 +242,7 @@ void patientConditions() {
 
     for (int i =  static_cast<int>(patientList.size()) - 1; i >= 0; --i) {
         if (patientList[i].status == "Deceased") {
+            patientSearch.erase(patientList[i].id);
             patientList.erase(patientList.begin() + i);
         }
     }
@@ -258,6 +278,8 @@ void menu() {
     cout<<"\n 1. Add a new patient\n";
     cout<<"\n 2. Show patients on waiting list\n";
     cout<<"\n 3. Treat Next Patient\n";
+    cout<<"\n 4. Search Patient ID\n";
+    cout<<"\n 5. Hospital departents\n";
     cout<<"\n 0. Exit\n";
 }
 
@@ -289,6 +311,9 @@ int main() {
         }
         else if (choice == 4) {
             treatPatient();
+        }
+        else if (choice == 5) {
+            hospitalDeparments();
         }
         else if (choice == 0) {
             cout << "\nSystem closed.\n";
