@@ -14,6 +14,8 @@ struct Patient {
 };
 
 vector<Patient> patientList;
+int userLives = 3;
+int nextId = 1;
 
 void addPatient() {
     Patient temp;
@@ -64,6 +66,34 @@ string triageLevel(int level) {
         return "Unspecified";
 }
 
+void spawnPatient() {
+    static int nameIndexCount = 0;
+
+    Patient temp;
+    temp.id = nextId++;
+
+    string patientNames[] = {"Joe", "Rob", "Riley", "CoCo", "Taylor", "RoRo", "Bob", "Martha"};
+    int nameIndex = nameIndexCount % 8;
+    nameIndexCount++;
+    temp.name = patientNames[nameIndex] + " #" + to_string(temp.id);
+
+    temp.level = (rand() % 3) + 1;
+
+    string reasons[] = {"missing arm", "head injury", "headache", "stomach ache", "paper cut",};
+    int reasonIndex = rand() % 5;
+    temp.reason = reasons[reasonIndex];
+
+    temp.status = "Waiting";
+    temp.waitRounds = 0;
+
+    patientList.push_back(temp);
+
+    cout <<"\n[NEW ARRIVAL] " << temp.name
+        << " entered the ER. \nCondition: " << triageLevel(temp.level)
+        << " (" << temp.reason << ")\n";
+}
+
+
 void patientConditions() {
     cout << "\n========== Patients' Conditions ==========\n";
 
@@ -91,12 +121,12 @@ void patientConditions() {
         }
     }
     if (!patientWorsened) {
-        cout<< "No patient condition worsened.\n";
+        cout<< "\nNo patient condition worsened.\n";
     }
  }
 
 void waitingList() {
-    cout<< "\n========== Patient List ==========\n";
+    cout<< "\n========== Patient List ==========\n\n";
 
     if(patientList.empty()) {
         cout << "\nPatient list empty.\n";
@@ -107,7 +137,11 @@ void waitingList() {
         cout << i + 1 << ". ";
         cout << "Name: " << patientList[i].name
             << ", ID: " << patientList[i].id
-            << ", Triage Level: " << triageLevel(patientList[i].level) << endl;
+            << ", Triage: " << triageLevel(patientList[i].level)
+            << ", Status: " << patientList[i].status
+            << ", Waiting Rounds: " << patientList[i].waitRounds
+            << ", Reason: " << patientList[i].reason
+            << "\n\n";
     }
 }
 
@@ -115,15 +149,23 @@ void menu() {
     cout<<"\n==============================\n";
     cout<<"  ✙ Hospital Triage System ✙ ";
     cout<<"\n==============================\n";
+    cout<< "   Patients on waitlist: " << patientList.size() << "\n";
+    cout << "-------------------------------\n";
     cout<<"\n 1. Add a new patient\n";
     cout<<"\n 2. Show patients on waiting list\n";
     cout<<"\n 0. Exit\n";
 }
 
 int main() {
+    srand(static_cast<unsigned int>(time(nullptr)));
     int choice;
 
     do {
+        int chance = rand() % 100;
+        if (chance < 40) {
+            spawnPatient();
+        }
+
         menu();
         if (!(cin >> choice)) {
             cout << "Invalid input. Try again.\n";
