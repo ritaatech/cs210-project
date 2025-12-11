@@ -277,8 +277,8 @@ void menu() {
     cout << "-------------------------------\n";
     cout<<"\n 1. Add a new patient\n";
     cout<<"\n 2. Show patients on waiting list\n";
-    cout<<"\n 3. Treat Next Patient\n";
-    cout<<"\n 4. Search Patient ID\n";
+    cout<<"\n 3. Search Patient ID\n";
+    cout<<"\n 4. Treat Patient\n";
     cout<<"\n 5. Hospital departents\n";
     cout<<"\n 0. Exit\n";
 }
