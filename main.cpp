@@ -1,8 +1,12 @@
 #include <iostream>
 #include <string>
 #include <vector>
-
+#include <queue>
+#include <unordered_map>
 using namespace std;
+
+queue<Patient> incomingQueue;
+unordered_map<int, Patient*> patientSearch;
 
 struct Patient {
     int id;
@@ -63,8 +67,25 @@ void addPatient() {
     temp.waitRounds = 0;
 
     patientList.push_back(temp);
+    patientSearch[temp.id] = &patientList.back();
     cout <<"\nThe Patient is added to the system.\n";
 };
+
+void incomingPatient() {
+    if (incomingQueue.empty()) {
+        return;
+    }
+
+    Patient p = incomingQueue.front();
+    incomingQueue.pop();
+
+    p.status = "Waiting";
+    p.waitRounds = 0;
+
+    patientList.push_back(p);
+
+    cout << "\n[PATIENT] " << p.name << " moved from the queue to ER.\n";
+}
 
 void spawnPatient() {
     static int nameIndexCount = 0;
@@ -87,12 +108,32 @@ void spawnPatient() {
     temp.waitRounds = 0;
 
     patientList.push_back(temp);
-
+    patientSearch[temp.id] = &patientList.back();
     cout <<"\n[NEW ARRIVAL] " << temp.name
         << " entered the ER. \nCondition: " << triageLevel(temp.level)
         << " (" << temp.reason << ")\n";
 }
 
+void patientId() {
+    int id;
+    cout << "\nEnter ID: ";
+    cin >> id;
+
+    if (patientSearch.count(id) == 0) {
+        cout << "Patient ID Not Found.\n";
+        return;
+    }
+
+    Patient* p = patientSearch[id];
+
+    cout << "\nPatient:\n";
+    cout << "Name: " << p->name
+         << ", ID: " << p->id
+         << ", Triage: " << triageLevel(p->level)
+         << ", Reason: " << p->reason
+         << ", Waiting Rounds: " << p->waitRounds
+         << "\n";
+}
 
 bool isBetterChoice(const Patient &a, const Patient &b) {
     if (a.level < b.level) return true;
@@ -123,7 +164,8 @@ void treatPatient() {
     cout << "You have treated: " << p.name << " !!"
          << " (Triage: " << triageLevel(p.level)
          << ", Reason: " << p.reason << ")\n";
-    
+
+    patientSearch.erase(p.id);
     patientList.erase(patientList.begin() + bestIndex);
 }
 
@@ -228,6 +270,7 @@ int main() {
         if (chance < 40) {
             spawnPatient();
         }
+        incomingPatient();
 
         menu();
         if (!(cin >> choice)) {
@@ -242,6 +285,9 @@ int main() {
             waitingList();
         }
         else if (choice == 3) {
+            patientId();
+        }
+        else if (choice == 4) {
             treatPatient();
         }
         else if (choice == 0) {
